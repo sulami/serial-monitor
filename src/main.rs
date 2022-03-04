@@ -1,3 +1,4 @@
+use std::env;
 use std::io::prelude::*;
 use std::io::{self, stdin, stdout, Write};
 use std::path::Path;
@@ -9,7 +10,14 @@ use serial_core::{SerialDevice, SerialPortSettings};
 use serial_unix::{TTYPort, TTYSettings};
 
 fn main() -> io::Result<()> {
-    let mut tty = TTYPort::open(Path::new("/dev/tty.usbmodemTEST1"))?;
+    let args: Vec<String> = env::args().collect();
+
+    if args.len() != 2 {
+        println!("usage: {} <tty>", args[0]);
+        return Ok(());
+    }
+
+    let mut tty = TTYPort::open(Path::new(&args[1]))?;
     tty.set_timeout(Duration::new(5, 0))?;
     let mut settings: TTYSettings = tty.read_settings()?;
     settings.set_baud_rate(serial_core::Baud9600)?;
