@@ -18,7 +18,7 @@ fn main() -> io::Result<()> {
     }
 
     let mut tty = TTYPort::open(Path::new(&args[1]))?;
-    tty.set_timeout(Duration::new(5, 0))?;
+    tty.set_timeout(Duration::new(3600, 0))?;
     let mut settings: TTYSettings = tty.read_settings()?;
     settings.set_baud_rate(serial_core::Baud9600)?;
     tty.write_settings(&settings)?;
