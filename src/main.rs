@@ -3,13 +3,14 @@ use std::io::{self, stdin, stdout, Write};
 use std::path::Path;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::time::Duration;
 
 use serial_core::{SerialDevice, SerialPortSettings};
 use serial_unix::{TTYPort, TTYSettings};
 
 fn main() -> io::Result<()> {
     let mut tty = TTYPort::open(Path::new("/dev/tty.usbmodemTEST1"))?;
-    tty.set_timeout(std::time::Duration::new(5, 0))?;
+    tty.set_timeout(Duration::new(5, 0))?;
     let mut settings: TTYSettings = tty.read_settings()?;
     settings.set_baud_rate(serial_core::Baud9600)?;
     tty.write_settings(&settings)?;
@@ -51,6 +52,9 @@ fn input_handler(tty_mutex: Arc<Mutex<TTYPort>>) {
 fn output_handler(tty_mutex: Arc<Mutex<TTYPort>>) -> ! {
     let mut char_buf = [0u8];
     loop {
+        // At 9600 Baud we get a new byte every 105 micros. Sleep a
+        // while to give other threads a chance to capture the TTY.
+        thread::sleep(Duration::from_micros(50));
         let mut tty = tty_mutex.lock().unwrap();
         tty.read_exact(&mut char_buf).unwrap();
         print!("{}", String::from_utf8(char_buf.to_vec()).unwrap());
