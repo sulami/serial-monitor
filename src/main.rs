@@ -6,15 +6,37 @@ use std::thread;
 use std::time::Duration;
 
 use clap::Parser;
+use serial_core::BaudRate::{self, *};
 use serial_core::SerialPort;
 use serial_unix::TTYPort;
 
+fn parse_baud_rate(s: &str) -> Result<BaudRate, &'static str> {
+    match s {
+        "110" => Ok(Baud110),
+        "300" => Ok(Baud300),
+        "600" => Ok(Baud600),
+        "1200" => Ok(Baud1200),
+        "2400" => Ok(Baud2400),
+        "4800" => Ok(Baud4800),
+        "9600" => Ok(Baud9600),
+        "19200" => Ok(Baud19200),
+        "38400" => Ok(Baud38400),
+        "57600" => Ok(Baud57600),
+        "115200" => Ok(Baud115200),
+        _ => Err("Unsupported baud rate"),
+    }
+}
+
 #[derive(Parser)]
-#[clap(name = "serial-monitor")]
-#[clap(about = "Simple Arduino Serial Monitor")]
+#[clap(author, version, about)]
 struct Args {
+    /// Path of the TTY device, e.g. /dev/tty123
     #[clap(required = true, short, long, parse(from_os_str))]
     path: PathBuf,
+
+    /// Baud rate
+    #[clap(short, long, parse(try_from_str = parse_baud_rate), default_value = "9600")]
+    baud: serial_core::BaudRate,
 }
 
 fn main() -> io::Result<()> {
@@ -22,7 +44,7 @@ fn main() -> io::Result<()> {
 
     let mut tty = TTYPort::open(&args.path)?;
     let _ = tty.reconfigure(&|settings| {
-        settings.set_baud_rate(serial_core::Baud9600).unwrap();
+        settings.set_baud_rate(args.baud).unwrap();
         Ok(())
     });
 

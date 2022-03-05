@@ -1,5 +1,7 @@
 [package]
 name = "serial-monitor"
+description = "Simple Arduino Serial Monitor"
+authors = ["Robin Schroer"]
 version = "0.1.0"
 edition = "2021"
 
