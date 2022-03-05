@@ -8,3 +8,4 @@ edition = "2021"
 [dependencies]
 serial-unix = "0.4"
 serial-core = "0.4"
+clap = {version = "3.1", features = ["derive"]}

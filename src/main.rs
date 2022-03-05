@@ -1,23 +1,26 @@
-use std::env;
 use std::io::prelude::*;
 use std::io::{self, stdin, stdout, Write};
-use std::path::Path;
+use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::time::Duration;
 
+use clap::Parser;
 use serial_core::SerialPort;
 use serial_unix::TTYPort;
 
+#[derive(Parser)]
+#[clap(name = "serial-monitor")]
+#[clap(about = "Simple Arduino Serial Monitor")]
+struct Args {
+    #[clap(required = true, short, long, parse(from_os_str))]
+    path: PathBuf,
+}
+
 fn main() -> io::Result<()> {
-    let args: Vec<String> = env::args().collect();
+    let args = Args::parse();
 
-    if args.len() != 2 {
-        println!("usage: {} <tty>", args[0]);
-        return Ok(());
-    }
-
-    let mut tty = TTYPort::open(Path::new(&args[1]))?;
+    let mut tty = TTYPort::open(&args.path)?;
     let _ = tty.reconfigure(&|settings| {
         settings.set_baud_rate(serial_core::Baud9600).unwrap();
         Ok(())
