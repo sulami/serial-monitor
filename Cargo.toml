@@ -1,11 +1,9 @@
 [package]
 name = "serial-monitor"
 description = "Simple Arduino Serial Monitor"
-authors = ["Robin Schroer"]
+authors = ["Robin Schroer <git@sulami.xyz>"]
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 serial-unix = "0.4"
