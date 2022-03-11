@@ -98,8 +98,15 @@ fn output_handler(tty_mutex: Arc<Mutex<TTYPort>>) {
         let mut char_buf = [0u8; 255];
         let mut tty = tty_mutex.lock().unwrap();
         if tty.read(&mut char_buf).is_ok() {
-            print!("{}", String::from_utf8(char_buf.to_vec()).unwrap());
-            stdout().flush().unwrap();
+            if let Ok(string) = String::from_utf8(char_buf.to_vec()) {
+                print!("{}", string);
+                stdout().flush().unwrap();
+            } else {
+                for c in char_buf {
+                    print!("\\x{:02X?}", c);
+                }
+                stdout().flush().unwrap();
+            }
         }
     }
 }
