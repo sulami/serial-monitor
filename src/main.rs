@@ -103,7 +103,11 @@ fn output_handler(tty_mutex: Arc<Mutex<TTYPort>>) {
                 stdout().flush().unwrap();
             } else {
                 for c in char_buf {
-                    print!("\\x{:02X?}", c);
+                    if c.is_ascii() {
+                        print!("{}", c);
+                    } else {
+                        print!("\\x{:02X?}", c);
+                    }
                 }
                 stdout().flush().unwrap();
             }
